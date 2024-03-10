@@ -2,20 +2,23 @@ import telebot
 import datetime
 import threading
 import time
+import pytz
 from decouple import config
 
 API_KEY = config("API_KEY")
 
 bot = telebot.TeleBot(API_KEY)
 
+# Define GMT+5 Time Zone
+leetcode_timezone = pytz.timezone("Asia/Karachi")
 
 def next_contest_start():
-    today = datetime.datetime.now()
+    today = datetime.datetime.now(leetcode_timezone)
     next_sunday_date = today + datetime.timedelta(days=(6 - today.weekday()) % 7)
     contest_start_time = next_sunday_date.replace(
         hour=7, minute=30, second=0, microsecond=0
     )
-    if datetime.datetime.now() >= contest_start_time:
+    if datetime.datetime.now(leetcode_timezone) >= contest_start_time:
         next_sunday_date += datetime.timedelta(weeks=1)
         contest_start_time = next_sunday_date.replace(
             hour=7, minute=30, second=0, microsecond=0
@@ -24,7 +27,7 @@ def next_contest_start():
 
 
 def is_contest_started():
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(leetcode_timezone)
     start_time = next_contest_start()
     if start_time <= now <= start_time + datetime.timedelta(hours=1):
         return True
@@ -35,7 +38,7 @@ def get_time_left():
     if is_contest_started():
         return "The LeetCode contest has already started!"
     contest_start_time = next_contest_start()
-    time_difference = contest_start_time - datetime.datetime.now()
+    time_difference = contest_start_time - datetime.datetime.now(leetcode_timezone)
     if time_difference.total_seconds() > 0:
         days, seconds = time_difference.days, time_difference.seconds
         hours, remainder = divmod(seconds, 3600)
