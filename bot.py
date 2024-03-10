@@ -50,15 +50,20 @@ def get_time_left():
 
 def update_time():
     while True:
+        new_message_ids = {}
         time_left = get_time_left()
         for chat_id, current_message_id in message_ids.items():
             try:
-                bot.edit_message_text(
+                message = bot.edit_message_text(
                     chat_id=chat_id, message_id=current_message_id, text=time_left
                 )
+                if message.text != time_left:
+                    new_message_ids[chat_id] = message.message_id
             except Exception as e:
                 print(f"Error updating message: {e}")
+        message_ids.update(new_message_ids)
         time.sleep(1)
+
 
 
 message_ids = {}
