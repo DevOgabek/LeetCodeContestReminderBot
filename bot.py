@@ -65,7 +65,6 @@ def update_time():
         time.sleep(1)
 
 
-
 message_ids = {}
 
 update_thread = threading.Thread(target=update_time)
